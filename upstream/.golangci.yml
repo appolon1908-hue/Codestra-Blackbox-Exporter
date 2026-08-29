@@ -1,0 +1,19 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - misspell
+    - modernize
+    - revive
+    - sloglint
+    - staticcheck
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+formatters:
+  exclusions:
+    generated: lax
