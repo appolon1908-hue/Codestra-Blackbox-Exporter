@@ -4,11 +4,11 @@ modules:
     timeout: 10s
     http:
       valid_http_versions:
-        - HTTP/1.1
-        - HTTP/2.0
+      - HTTP/1.1
+      - HTTP/2.0
       valid_status_codes:
-        - 200
-        - 204
+      - 200
+      - 204
       method: GET
       follow_redirects: false
       fail_if_not_ssl: true
@@ -20,16 +20,15 @@ modules:
       tls_config:
         insecure_skip_verify: false
         min_version: TLS12
-
   https_redirect_chain:
     prober: http
     timeout: 15s
     http:
       valid_http_versions:
-        - HTTP/1.1
-        - HTTP/2.0
+      - HTTP/1.1
+      - HTTP/2.0
       valid_status_codes:
-        - 200
+      - 200
       method: GET
       follow_redirects: true
       fail_if_not_ssl: true
@@ -40,21 +39,20 @@ modules:
       tls_config:
         insecure_skip_verify: false
         min_version: TLS12
-
   https_health_json:
     prober: http
     timeout: 10s
     http:
       valid_http_versions:
-        - HTTP/1.1
-        - HTTP/2.0
+      - HTTP/1.1
+      - HTTP/2.0
       valid_status_codes:
-        - 200
+      - 200
       method: GET
       follow_redirects: false
       fail_if_not_ssl: true
       fail_if_body_not_matches_regexp:
-        - '"(status|state)"[[:space:]]*:[[:space:]]*"(ok|healthy|ready|up)"'
+      - '"(status|state)"[[:space:]]*:[[:space:]]*"(ok|healthy|ready|up)"'
       preferred_ip_protocol: ip4
       ip_protocol_fallback: false
       headers:
@@ -63,14 +61,12 @@ modules:
       tls_config:
         insecure_skip_verify: false
         min_version: TLS12
-
   tcp_connect:
     prober: tcp
     timeout: 5s
     tcp:
       preferred_ip_protocol: ip4
       ip_protocol_fallback: false
-
   tcp_tls:
     prober: tcp
     timeout: 10s
@@ -81,7 +77,6 @@ modules:
       tls_config:
         insecure_skip_verify: false
         min_version: TLS12
-
   dns_codestra_media_a:
     prober: dns
     timeout: 5s
@@ -91,11 +86,10 @@ modules:
       query_name: codestra.media
       query_type: A
       valid_rcodes:
-        - NOERROR
+      - NOERROR
       validate_answer_rrs:
         fail_if_not_matches_regexp:
-          - '.*[[:space:]]IN[[:space:]]+A[[:space:]]+.*'
-
+        - .*[[:space:]]IN[[:space:]]+A[[:space:]]+.*
   dns_codestra_co_a:
     prober: dns
     timeout: 5s
@@ -105,7 +99,30 @@ modules:
       query_name: codestra.co
       query_type: A
       valid_rcodes:
-        - NOERROR
+      - NOERROR
       validate_answer_rrs:
         fail_if_not_matches_regexp:
-          - '.*[[:space:]]IN[[:space:]]+A[[:space:]]+.*'
+        - .*[[:space:]]IN[[:space:]]+A[[:space:]]+.*
+  https_intake_readiness_json:
+    prober: http
+    timeout: 8s
+    http:
+      valid_http_versions:
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      method: GET
+      follow_redirects: false
+      fail_if_not_ssl: true
+      fail_if_body_not_matches_regexp:
+      - '"(status|state)"[[:space:]]*:[[:space:]]*"(ok|healthy|ready|up)"'
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false
+      headers:
+        Accept: application/json
+        User-Agent: Codestra-Blackbox/1.0
+        X-Codestra-Probe-Class: intake-readiness
+      tls_config:
+        insecure_skip_verify: false
+        min_version: TLS12
