@@ -57,6 +57,9 @@ jobs:
           compose_text = (root / "compose-codestra.yaml").read_text()
           compose = yaml.safe_load(compose_text)
           service = compose["services"]["blackbox-exporter"]
+          assert set(service["networks"]) == {"prometheus_blackbox"}
+          assert compose["networks"]["prometheus_blackbox"]["external"] is True
+          assert compose["networks"]["prometheus_blackbox"]["name"] == "${CODESTRA_PROMETHEUS_BLACKBOX_NETWORK:-codestra-prometheus-blackbox}"
 
           required_businesses = {
               "codestra", "moneybee", "beyvra", "breero", "larim-a",

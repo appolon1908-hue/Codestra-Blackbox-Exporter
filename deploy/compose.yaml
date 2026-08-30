@@ -24,13 +24,13 @@ services:
     volumes:
       - ../config/blackbox.yml:/etc/blackbox_exporter/blackbox.yml:ro
     networks:
-      observability:
+      prometheus_blackbox:
         aliases:
           - blackbox-exporter
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=16m
 
 networks:
-  observability:
+  prometheus_blackbox:
     external: true
-    name: ${CODESTRA_OBSERVABILITY_NETWORK:-codestra-observability}
+    name: ${CODESTRA_PROMETHEUS_BLACKBOX_NETWORK:-codestra-prometheus-blackbox}

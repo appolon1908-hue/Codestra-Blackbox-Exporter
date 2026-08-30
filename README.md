@@ -4,7 +4,7 @@ This repository is the service authority for governed HTTP, HTTPS, TCP, DNS, ICM
 
 ## Security boundary
 
-Blackbox Exporter can initiate network connections to a caller-selected target, so `/probe` is a sensitive internal control surface. It runs only on the private `codestra-observability` network, has no host port, and must not receive a public Caddy/Kong route. `blac.codestra.media` is an ownership/DNS identifier, not permission for public access. Only the authoritative Prometheus service and approved observability operators may reach `blackbox-exporter:9115`.
+Blackbox Exporter can initiate network connections to a caller-selected target, so `/probe` is a sensitive internal control surface. It runs only on the dedicated external `codestra-prometheus-blackbox` network, whose only members are the authoritative Prometheus service and Blackbox Exporter. It has no host port and must not receive a public Caddy/Kong route. `blac.codestra.media` is an ownership/DNS identifier, not permission for public access. Operators reach probe results through Prometheus rather than joining arbitrary workloads to this network.
 
 The container runs as UID/GID 65534 with a read-only filesystem, drops every capability, adds back only `NET_RAW` for ICMP, and enables `no-new-privileges`. HTTPS probes require TLS and verify certificates. IPv4 fallback is disabled so results do not silently change address families.
 
@@ -31,6 +31,7 @@ A future approved deployment may use:
 ```bash
 cp .env.example .env
 # Set an accepted image digest.
+python3 scripts/validate_deployment_inputs.py
 docker compose -f deploy/compose.yaml config
 docker compose -f deploy/compose.yaml up -d
 # From Prometheus/private observability network only:
