@@ -31,7 +31,7 @@ A future approved deployment may use:
 ```bash
 cp .env.example .env
 # Set an accepted image digest.
-python3 scripts/validate_deployment_inputs.py
+python3 scripts/validate_deployment_inputs.py --env-file .env
 docker compose -f deploy/compose.yaml config
 docker compose -f deploy/compose.yaml up -d
 # From Prometheus/private observability network only:
@@ -43,3 +43,5 @@ Those commands are documentation only during the repository-first phase. Before 
 ## Promotion and safety
 
 Promotion is `feature/* -> development -> test -> staging -> production -> main`. Merging changes source authority only and does not deploy. `DEPLOYMENT_ENABLED=NO` remains binding until the 14-repository release manifest is accepted.
+
+Automated upstream synchronization requires the repository Actions secret `CODESTRA_AUTOMATION_TOKEN`, backed by an approved GitHub App or fine-grained token with contents and pull-request permissions. The non-default token is required so generated review PRs trigger normal exact-source validation; absence of the secret fails the sync closed.

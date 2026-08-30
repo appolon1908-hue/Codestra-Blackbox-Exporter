@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "codestra/runtime-v1/**"
+      - "upstream/**"
+      - "CODESTRA_UPSTREAM_LOCK.json"
       - ".github/workflows/validate-codestra-runtime-v1.yml"
   push:
     branches:
@@ -14,6 +16,8 @@ on:
       - main
     paths:
       - "codestra/runtime-v1/**"
+      - "upstream/**"
+      - "CODESTRA_UPSTREAM_LOCK.json"
       - ".github/workflows/validate-codestra-runtime-v1.yml"
 
 permissions:
