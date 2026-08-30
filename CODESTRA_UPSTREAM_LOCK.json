@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "upstream_clone_url": "https://github.com/prometheus/blackbox_exporter.git",
+  "upstream_ref": "master",
+  "upstream_commit": "19352b58dc26d81ac63ba13680135f7527a29524",
+  "import_path": "upstream",
+  "synchronized_at": "2026-08-29T18:18:39.972617+00:00",
+  "deployment_enabled": false,
+  "secret_material_allowed_in_git": false
+}
