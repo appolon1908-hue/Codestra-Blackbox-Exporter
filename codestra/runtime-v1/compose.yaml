@@ -22,7 +22,7 @@ services:
     tmpfs:
       - /tmp:size=16m,mode=1777
     networks:
-      - codestra_observability
+      - prometheus_blackbox
     deploy:
       resources:
         limits:
@@ -33,6 +33,6 @@ services:
           memory: 64M
 
 networks:
-  codestra_observability:
+  prometheus_blackbox:
     external: true
-    name: codestra-observability
+    name: ${CODESTRA_PROMETHEUS_BLACKBOX_NETWORK:-codestra-prometheus-blackbox}
