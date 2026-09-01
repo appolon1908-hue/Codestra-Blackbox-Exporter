@@ -68,7 +68,12 @@ jobs:
             base_sha="${{ github.event.pull_request.base.sha }}"
           elif [[ "$GITHUB_EVENT_NAME" == push && "${{ github.event.before }}" =~ ^[0-9a-f]{40}$ && "${{ github.event.before }}" != '0000000000000000000000000000000000000000' ]]; then
             base_sha="${{ github.event.before }}"
+          elif [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            git fetch --no-tags origin main:refs/remotes/origin/main
+            base_sha="$(git merge-base refs/remotes/origin/main "$GITHUB_SHA")"
+            [[ "$base_sha" =~ ^[0-9a-f]{40}$ ]]
           else
-            base_sha="$(git rev-parse HEAD^)"
+            echo "Unsupported validation event for base selection." >&2
+            exit 2
           fi
           git diff --check "$base_sha" "$GITHUB_SHA" -- . ':(exclude)upstream'

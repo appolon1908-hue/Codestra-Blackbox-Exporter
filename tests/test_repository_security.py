@@ -47,6 +47,18 @@ class RepositorySecurityTests(unittest.TestCase):
         ):
             self.assertIn(token, self.sync_source)
 
+    def test_sync_rejects_quoted_and_obscured_protected_refspecs(self) -> None:
+        safe = 'git push origin "HEAD:refs/heads/${SYNC_BRANCH}"'
+        for command in (
+            'git push origin "HEAD:refs/heads/main"',
+            '(git push origin HEAD:refs/heads/staging)',
+            '/usr/bin/git -c protocol.version=2 push origin HEAD:refs/heads/production>/dev/null',
+        ):
+            with self.subTest(command=command):
+                unsafe = self.sync_source.replace(safe, command)
+                with self.assertRaisesRegex(ValueError, "protected_branch_sync_forbidden"):
+                    VALIDATOR.validate_sync(unsafe, yaml.safe_load(unsafe))
+
     def test_bot_created_pr_dispatches_exact_branch_validation(self) -> None:
         self.assertEqual(
             self.sync_document["permissions"],
@@ -79,6 +91,17 @@ class RepositorySecurityTests(unittest.TestCase):
             'git diff --check "$base_sha" "$GITHUB_SHA" -- . \':(exclude)upstream\'',
             source,
         )
+        self.assertIn(
+            'base_sha="$(git merge-base refs/remotes/origin/main "$GITHUB_SHA")"',
+            source,
+        )
+        self.assertNotIn('base_sha="$(git rev-parse HEAD^)"', source)
+        unsafe = source.replace(
+            'base_sha="$(git merge-base refs/remotes/origin/main "$GITHUB_SHA")"',
+            'base_sha="$(git rev-parse HEAD^)"',
+        )
+        with self.assertRaisesRegex(ValueError, "validation_boundary_missing"):
+            VALIDATOR.validate_workflow(unsafe)
 
 
 if __name__ == "__main__":
