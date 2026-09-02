@@ -35,15 +35,28 @@ jobs:
           required = [
               'appolon1908-hue/Codestra-Blackbox-Exporter', '37.27.128.39',
               'SOURCE_CONTRACT_PREPARED_NOT_DEPLOYED', 'GET` | `/-/healthy',
-              'GET` | `/metrics', 'GET` | `/probe', 'SSRF_TESTS=PASS',
-              'DNS_REBINDING_DENIED=PASS', 'CREDENTIAL_TARGET_DENIED=PASS',
-              'UNEXPECTED_404=0', 'SOURCE_RUNTIME_DRIFT=0',
-              'This document does not deploy Blackbox Exporter',
+              'GET` | `/metrics', 'GET` | `/probe',
+              'appolon1908-hue/Codestra-Prometheus` owns target discovery',
+              'Target addresses must not be stored in this repository',
+              'PROMETHEUS_TARGET_DISCOVERY_AND_ALLOWLIST=PASS',
+              'BLACKBOX_REPOSITORY_TARGET_ADDRESSES=0',
+              'TARGET_SOURCE=CODESTRA_PROMETHEUS',
+              'GET_/probe_PROMETHEUS_ALLOWLISTED_TARGET=PASS',
+              'GET_/probe_ARBITRARY_OPERATOR_TARGET=DENIED',
+              'SSRF_TESTS=PASS', 'DNS_REBINDING_DENIED=PASS',
+              'CREDENTIAL_TARGET_DENIED=PASS', 'UNEXPECTED_404=0',
+              'SOURCE_RUNTIME_DRIFT=0', 'This document does not deploy Blackbox Exporter',
           ]
           missing = [value for value in required if value not in text]
           assert not missing, f'missing production API contract controls: {missing}'
-          forbidden = ['ADMIN_BYPASS_AUTHORIZED=YES', 'SSH_CONFIGURATION_CHANGES_AUTHORIZED=YES', ':latest']
+          forbidden = [
+              'Blackbox Exporter owns probe modules, target allowlists',
+              'Fix modules, allowlists, validation, or runtime configuration here',
+              'ADMIN_BYPASS_AUTHORIZED=YES',
+              'SSH_CONFIGURATION_CHANGES_AUTHORIZED=YES',
+              ':latest',
+          ]
           present = [value for value in forbidden if value in text]
-          assert not present, f'forbidden production contract claims: {present}'
+          assert not present, f'forbidden or competing authority claims: {present}'
           print('CODESTRA_BLACKBOX_EXPORTER_PRODUCTION_API_CONTRACT=PASS')
           PY
