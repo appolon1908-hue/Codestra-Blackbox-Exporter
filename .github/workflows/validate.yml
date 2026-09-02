@@ -18,7 +18,6 @@ jobs:
         run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - name: Render and inspect compose authority
         env:
-          BLACKBOX_EXPORTER_IMAGE: example.invalid/blackbox-exporter@sha256:0000000000000000000000000000000000000000000000000000000000000000
           CODESTRA_PROMETHEUS_BLACKBOX_NETWORK: codestra-prometheus-blackbox
         run: |
           set -euo pipefail
