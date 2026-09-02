@@ -6,9 +6,9 @@ This repository owns the **synthetic-availability-dns-tls-authority** for the Co
 
 Blackbox Exporter keeps its native API and protocol. The shared Codestra control plane in `appolon1908-hue/Codestra-Telemetry` performs only sanitized health, readiness, contract, topology, and immutable-release read-back. It never proxies native probe output, permits caller-selected targets, changes modules, mutates endpoints, reads secret values, or issues credentials.
 
-Canonical hostname: `blac.codestra.media`  
-Native exposure: `internal_private`  
-Deployment class: `central`  
+Canonical hostname: `blac.codestra.media`
+Native exposure: `internal_private`
+Deployment class: `central`
 Contract: `codestra/api/service-contract.v1.json`
 
 ## Native operations
