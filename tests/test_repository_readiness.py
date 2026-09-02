@@ -16,4 +16,15 @@ class ReadinessTests(unittest.TestCase):
             manifest = json.loads((ROOT / "codestra/release/config-bundle.manifest.json").read_text())
             with tarfile.open(paths[0], "r:gz") as archive: names = set(archive.getnames())
             self.assertEqual(names, set(manifest["files"]) | {"codestra/release/config-bundle.manifest.json"})
+    def test_release_job_is_structurally_pinned(self) -> None:
+        import yaml
+        workflow = yaml.safe_load((ROOT / ".github/workflows/release-config-bundle.yml").read_text())
+        job = workflow["jobs"]["release"]
+        self.assertEqual(
+            job["uses"],
+            "appolon1908-hue/Codestra-Telemetry/.github/workflows/"
+            "reusable-release-config-bundle.yml@"
+            "777292781faeca9348d0e2ecdce6ac3f50c91d93",
+        )
+        self.assertEqual(job["with"]["component_id"], "blackbox-exporter")
 if __name__ == "__main__": unittest.main()

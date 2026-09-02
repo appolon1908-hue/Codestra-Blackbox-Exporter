@@ -3,9 +3,12 @@
 from __future__ import annotations
 import hashlib, json, re
 from pathlib import Path
+
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 COMPOSE = ("deploy/compose.yaml", "codestra/runtime-v1/compose.yaml", "codestra/runtime-v1/compose-codestra.yaml")
-REQUIRED = ("README.md", "REPOSITORY_PROFILE.md", "SECURITY.md", ".github/CODEOWNERS", "docs/BACKUP_RESTORE_ROLLBACK.md", "docs/UPGRADE.md", "codestra/release/runtime-image.lock.json", "codestra/release/config-bundle.manifest.json", ".github/workflows/release-config-bundle.yml", "scripts/build_config_bundle.py")
+REQUIRED = ("README.md", "REPOSITORY_PROFILE.md", "SECURITY.md", ".github/CODEOWNERS", "docs/BACKUP_RESTORE_ROLLBACK.md", "docs/UPGRADE.md", "codestra/release/runtime-image.lock.json", "codestra/release/config-bundle.manifest.json", ".github/workflows/release-config-bundle.yml", "scripts/build_config_bundle.py", "requirements-validation.txt")
 def fail(message: str) -> None: raise SystemExit(f"ERROR: {message}")
 def load(path: str) -> dict:
     value = json.loads((ROOT / path).read_text())
@@ -35,8 +38,15 @@ def validate() -> None:
     for workflow in (ROOT / ".github/workflows").glob("*.yml"):
         for reference in re.findall(r"(?m)^\s*(?:-\s*)?uses:\s*([^\s#]+)", workflow.read_text()):
             if not reference.startswith("./") and not re.fullmatch(r"[^@\s]+@[0-9a-f]{40}", reference): fail(f"mutable action: {workflow.name}: {reference}")
-    caller = (ROOT / ".github/workflows/release-config-bundle.yml").read_text()
-    if "reusable-release-config-bundle.yml@777292781faeca9348d0e2ecdce6ac3f50c91d93" not in caller or "component_id: blackbox-exporter" not in caller: fail("release caller mismatch")
+    caller = yaml.safe_load((ROOT / ".github/workflows/release-config-bundle.yml").read_text())
+    release_job = caller.get("jobs", {}).get("release", {})
+    authority = (
+        "appolon1908-hue/Codestra-Telemetry/.github/workflows/"
+        "reusable-release-config-bundle.yml@"
+        "777292781faeca9348d0e2ecdce6ac3f50c91d93"
+    )
+    if release_job.get("uses") != authority: fail("release caller workflow authority mismatch")
+    if release_job.get("with", {}).get("component_id") != "blackbox-exporter": fail("release caller component identity mismatch")
 def main() -> None:
     validate(); print("BLACKBOX_EXPORTER_REPOSITORY_READINESS_SOURCE=PASS"); print("PRODUCTION_ACTIVATION=NO")
 if __name__ == "__main__": main()
