@@ -14,5 +14,6 @@
 - Privilege exception: only `NET_RAW` for the reviewed ICMP module; no privileged mode or other capability
 - Persistence: none
 - Release/rollback: exact image/config digests and checksum with a pullable previous artifact
+- Source hygiene: whitespace enforcement applies to Codestra-owned files; `upstream/` is byte-preserved and exempt through `.gitattributes`
 
 Current verdict: `SOURCE_PREPARED_NOT_DEPLOYED`; registry and production evidence remain absent.
