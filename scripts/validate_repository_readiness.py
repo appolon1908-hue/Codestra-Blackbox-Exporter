@@ -8,7 +8,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPOSE = ("deploy/compose.yaml", "codestra/runtime-v1/compose.yaml", "codestra/runtime-v1/compose-codestra.yaml")
-REQUIRED = ("README.md", "REPOSITORY_PROFILE.md", "SECURITY.md", ".github/CODEOWNERS", "docs/BACKUP_RESTORE_ROLLBACK.md", "docs/UPGRADE.md", "codestra/release/runtime-image.lock.json", "codestra/release/config-bundle.manifest.json", ".github/workflows/release-config-bundle.yml", "scripts/build_config_bundle.py", "requirements-validation.txt")
+REQUIRED = (".gitattributes", "README.md", "REPOSITORY_PROFILE.md", "SECURITY.md", ".github/CODEOWNERS", "docs/BACKUP_RESTORE_ROLLBACK.md", "docs/UPGRADE.md", "codestra/release/runtime-image.lock.json", "codestra/release/config-bundle.manifest.json", ".github/workflows/release-config-bundle.yml", "scripts/build_config_bundle.py", "requirements-validation.txt")
 def fail(message: str) -> None: raise SystemExit(f"ERROR: {message}")
 def load(path: str) -> dict:
     value = json.loads((ROOT / path).read_text())
@@ -17,6 +17,7 @@ def load(path: str) -> dict:
 def validate() -> None:
     missing = [path for path in REQUIRED if not (ROOT / path).is_file()]
     if missing: fail(f"missing readiness files: {missing}")
+    if (ROOT / ".gitattributes").read_text().splitlines()[-1] != "upstream/** -whitespace": fail("vendored upstream whitespace boundary is missing")
     lock = load("codestra/release/runtime-image.lock.json"); image = lock.get("image", "")
     if not re.fullmatch(r"[a-z0-9./_-]+@sha256:[0-9a-f]{64}", image): fail("runtime image is mutable")
     if lock.get("binaryRevisionReadback") != lock.get("upstreamTagCommit"): fail("binary/source revision mismatch")
